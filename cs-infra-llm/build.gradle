@@ -1,0 +1,7 @@
+dependencies {
+    implementation project(':cs-application')
+    implementation "org.springframework:spring-context:${springFrameworkVersion}"
+
+    testImplementation "org.junit.jupiter:junit-jupiter:${junitVersion}"
+    testImplementation "org.assertj:assertj-core:${assertjVersion}"
+}

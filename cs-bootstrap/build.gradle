@@ -1,0 +1,17 @@
+plugins {
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
+}
+
+dependencies {
+    implementation project(':cs-api')
+    implementation project(':cs-application')
+    implementation project(':cs-domain')
+    implementation project(':cs-infra-commerce')
+    implementation project(':cs-infra-llm')
+    implementation project(':cs-infra-persistence')
+
+    implementation 'org.springframework.boot:spring-boot-starter'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}

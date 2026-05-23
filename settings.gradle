@@ -1,0 +1,24 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        mavenCentral()
+    }
+}
+
+rootProject.name = 'commerce-cs-agent'
+
+include 'cs-bootstrap'
+include 'cs-api'
+include 'cs-application'
+include 'cs-domain'
+include 'cs-infra-llm'
+include 'cs-infra-commerce'
+include 'cs-infra-persistence'
+include 'cs-test-support'

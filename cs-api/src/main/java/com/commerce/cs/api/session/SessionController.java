@@ -3,6 +3,7 @@ package com.commerce.cs.api.session;
 import com.commerce.cs.application.verification.VerificationCommand;
 import com.commerce.cs.application.verification.VerificationResult;
 import com.commerce.cs.application.verification.VerificationUseCase;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,7 +21,7 @@ public class SessionController {
     }
 
     @PostMapping("/verify")
-    public ResponseEntity<VerificationResponse> verify(@RequestBody VerificationRequest request) {
+    public ResponseEntity<VerificationResponse> verify(@Valid @RequestBody VerificationRequest request) {
         VerificationResult result = verificationUseCase.verify(
             new VerificationCommand(request.sessionId(), request.email(), request.phoneLast4())
         );

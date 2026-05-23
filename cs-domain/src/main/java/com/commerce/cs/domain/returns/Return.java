@@ -18,7 +18,8 @@ public final class Return {
         String userId,
         ReturnReason reason,
         String detail,
-        Instant requestedAt
+        Instant requestedAt,
+        ReturnStatus status
     ) {
         this.id = requireText(id, "id");
         this.orderId = requireText(orderId, "orderId");
@@ -32,7 +33,7 @@ public final class Return {
         this.reason = reason;
         this.detail = detail;
         this.requestedAt = requestedAt;
-        this.status = ReturnStatus.REQUESTED;
+        this.status = status == null ? ReturnStatus.REQUESTED : status;
     }
 
     public static Return request(
@@ -43,7 +44,19 @@ public final class Return {
         String detail,
         Instant requestedAt
     ) {
-        return new Return(id, orderId, userId, reason, detail, requestedAt);
+        return new Return(id, orderId, userId, reason, detail, requestedAt, ReturnStatus.REQUESTED);
+    }
+
+    public static Return restore(
+        String id,
+        String orderId,
+        String userId,
+        ReturnReason reason,
+        String detail,
+        Instant requestedAt,
+        ReturnStatus status
+    ) {
+        return new Return(id, orderId, userId, reason, detail, requestedAt, status);
     }
 
     public void transitionTo(ReturnStatus targetStatus) {

@@ -11,7 +11,10 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public final class ToolExecutor {
+import org.springframework.stereotype.Service;
+
+@Service
+public class ToolExecutor {
 
     private static final Duration IDEMPOTENCY_TTL = Duration.ofMinutes(5);
     private static final Duration LOCK_TIMEOUT = Duration.ofSeconds(3);

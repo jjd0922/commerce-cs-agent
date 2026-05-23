@@ -139,7 +139,7 @@ class ChatUseCaseConfirmationTest {
     }
 
     private ChatUseCase useCaseWith(ToolHandler tool) {
-        return new ChatUseCase(
+        return new ChatService(
             sessionManager,
             llmClient,
             new ToolExecutor(List.of(tool), idempotencyStore, distributedLock)

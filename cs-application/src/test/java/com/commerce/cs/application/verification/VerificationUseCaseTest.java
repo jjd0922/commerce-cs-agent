@@ -18,7 +18,7 @@ class VerificationUseCaseTest {
         FakeCustomerLookupPort customerLookupPort = new FakeCustomerLookupPort();
         customerLookupPort.save(new CustomerIdentity("user-1", "customer@example.com", "5678"));
         FakeSessionStore sessionStore = new FakeSessionStore();
-        VerificationUseCase useCase = new VerificationUseCase(customerLookupPort, sessionStore);
+        VerificationUseCase useCase = new VerificationService(customerLookupPort, sessionStore);
 
         VerificationResult result = useCase.verify(
             new VerificationCommand("session-1", "customer@example.com", "5678")
@@ -34,7 +34,7 @@ class VerificationUseCaseTest {
 
     @Test
     void verification_fails_when_customer_does_not_exist() {
-        VerificationUseCase useCase = new VerificationUseCase(new FakeCustomerLookupPort(), new FakeSessionStore());
+        VerificationUseCase useCase = new VerificationService(new FakeCustomerLookupPort(), new FakeSessionStore());
 
         VerificationResult result = useCase.verify(
             new VerificationCommand("session-1", "missing@example.com", "5678")
@@ -48,7 +48,7 @@ class VerificationUseCaseTest {
         FakeCustomerLookupPort customerLookupPort = new FakeCustomerLookupPort();
         customerLookupPort.save(new CustomerIdentity("user-1", "customer@example.com", "5678"));
         FakeSessionStore sessionStore = new FakeSessionStore();
-        VerificationUseCase useCase = new VerificationUseCase(customerLookupPort, sessionStore);
+        VerificationUseCase useCase = new VerificationService(customerLookupPort, sessionStore);
 
         VerificationResult result = useCase.verify(
             new VerificationCommand("session-1", "customer@example.com", "0000")

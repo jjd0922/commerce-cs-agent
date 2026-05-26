@@ -7,6 +7,7 @@ import com.commerce.cs.infra.persistence.outbox.OutboxMessage;
 import com.commerce.cs.infra.persistence.outbox.OutboxPoller;
 import com.commerce.cs.infra.persistence.outbox.OutboxStatus;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,6 +34,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @DisplayName("OutboxPoller 동시 polling 처리")
+@Tag("integration")
 @Testcontainers(disabledWithoutDocker = true)
 @ActiveProfiles("local")
 @SpringBootTest(

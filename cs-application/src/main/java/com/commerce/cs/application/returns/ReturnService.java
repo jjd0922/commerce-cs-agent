@@ -8,6 +8,7 @@ import com.commerce.cs.domain.returns.Return;
 import com.commerce.cs.domain.returns.ReturnPolicy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -24,6 +25,7 @@ public class ReturnService implements ReturnUseCase {
     private final Clock clock;
 
     @Override
+    @Transactional
     public ReturnResult requestReturn(ReturnCommand command) {
         return returnRepository.findByIdempotencyKey(command.idempotencyKey())
             .map(existing -> toResult(existing, existing.requestedAt(), order(command)))

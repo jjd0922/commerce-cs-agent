@@ -24,4 +24,8 @@ public class InMemoryReturnRepository implements ReturnRepository {
     public void save(Return returnRequest, String idempotencyKey) {
         returnsByIdempotencyKey.put(idempotencyKey, returnRequest);
     }
+
+    public long count() {
+        return returnsByIdempotencyKey.size();
+    }
 }

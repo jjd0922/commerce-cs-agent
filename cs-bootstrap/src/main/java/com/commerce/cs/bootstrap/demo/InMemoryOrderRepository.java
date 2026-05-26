@@ -33,6 +33,16 @@ public class InMemoryOrderRepository implements OrderRepository {
             Instant.parse("2026-05-19T00:00:00Z"),
             Instant.parse("2026-05-20T00:00:00Z")
         ));
+        save(new Order(
+            "order-2",
+            "user-1",
+            OrderStatus.SHIPPED,
+            PaymentStatus.PAID,
+            ShipmentStatus.IN_TRANSIT,
+            List.of(new OrderItem("product-2", "Demo Backpack", 1, Money.won(80_000))),
+            Instant.parse("2026-05-21T00:00:00Z"),
+            null
+        ));
     }
 
     @Override

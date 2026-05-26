@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -115,8 +116,30 @@ class ChatUseCaseConfirmationTest {
         ChatResult result = useCase.handle(new ChatCommand("session-1", "hello"));
 
         assertThat(result).isEqualTo(new ChatResult.Text("Hello"));
+        verify(sessionManager).appendUserMessage("session-1", "hello");
         verify(sessionManager).appendAssistantMessage("session-1", "Hello");
         verifyNoInteractions(toolExecutor);
+    }
+
+    @Test
+    @DisplayName("LLM 요청에는 현재 세션의 최근 대화 이력을 포함한다")
+    void llm_request_contains_session_history() {
+        ChatContext context = new ChatContext("session-1", null, false);
+        List<ChatMessage> history = List.of(
+            new ChatMessage(ChatMessage.Role.USER, "I want to return my order."),
+            new ChatMessage(ChatMessage.Role.ASSISTANT, "Please share your order id.")
+        );
+        when(sessionManager.loadContext("session-1")).thenReturn(new SessionContext(context, null, history));
+        when(llmClient.call(argThat(request ->
+            request.userMessage().equals("order-1")
+                && request.history().equals(history)
+        ))).thenReturn(new LlmResponse.Text("I can help with that."));
+        ChatUseCase useCase = useCase();
+
+        ChatResult result = useCase.handle(new ChatCommand("session-1", "order-1"));
+
+        assertThat(result).isEqualTo(new ChatResult.Text("I can help with that."));
+        verify(sessionManager).appendUserMessage("session-1", "order-1");
     }
 
     private ChatUseCase useCase() {

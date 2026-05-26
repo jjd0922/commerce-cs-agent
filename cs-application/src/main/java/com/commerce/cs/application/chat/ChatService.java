@@ -21,11 +21,16 @@ public class ChatService implements ChatUseCase {
     @Override
     public ChatResult handle(ChatCommand command) {
         SessionContext sessionContext = sessionManager.loadContext(command.sessionId());
+        sessionManager.appendUserMessage(command.sessionId(), command.message());
         if (sessionContext.hasPendingAction()) {
             return handlePendingAction(command, sessionContext);
         }
 
-        LlmResponse response = llmClient.call(new LlmRequest(sessionContext.chatContext(), command.message()));
+        LlmResponse response = llmClient.call(new LlmRequest(
+            sessionContext.chatContext(),
+            command.message(),
+            sessionContext.history()
+        ));
         if (response instanceof LlmResponse.Text text) {
             sessionManager.appendAssistantMessage(command.sessionId(), text.text());
             return new ChatResult.Text(text.text());
@@ -43,10 +48,12 @@ public class ChatService implements ChatUseCase {
 
         if (decision == ConfirmationDecision.REJECT) {
             sessionManager.clearPendingAction(command.sessionId());
+            sessionManager.appendAssistantMessage(command.sessionId(), "Pending action was cancelled.");
             return new ChatResult.Cancelled("Pending action was cancelled.");
         }
 
         if (decision == ConfirmationDecision.UNKNOWN) {
+            sessionManager.appendAssistantMessage(command.sessionId(), "Please answer yes or no.");
             return new ChatResult.RequiresConfirmation("Please answer yes or no.");
         }
 
@@ -57,6 +64,7 @@ public class ChatService implements ChatUseCase {
         );
 
         if (validation instanceof ValidationResult.RequiresAuthentication requiresAuthentication) {
+            sessionManager.appendAssistantMessage(command.sessionId(), requiresAuthentication.message());
             return new ChatResult.RequiresAuthentication(requiresAuthentication.message());
         }
 
@@ -73,6 +81,7 @@ public class ChatService implements ChatUseCase {
         ValidationResult validation = toolExecutor.validate(toolUse.toolName(), toolUse.args(), context);
 
         if (validation instanceof ValidationResult.RequiresAuthentication requiresAuthentication) {
+            sessionManager.appendAssistantMessage(sessionId, requiresAuthentication.message());
             return new ChatResult.RequiresAuthentication(requiresAuthentication.message());
         }
 
@@ -84,6 +93,7 @@ public class ChatService implements ChatUseCase {
                 java.time.Instant.now()
             );
             sessionManager.savePendingAction(sessionId, pendingAction);
+            sessionManager.appendAssistantMessage(sessionId, requiresConfirmation.message());
             return new ChatResult.RequiresConfirmation(requiresConfirmation.message());
         }
 

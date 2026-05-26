@@ -124,6 +124,30 @@ class ToolExecutorTest {
     }
 
     @Test
+    @DisplayName("컨텍스트에 current idempotency key가 있으면 재계산하지 않고 해당 key로 실행한다")
+    void execution_uses_current_idempotency_key_from_context() {
+        ToolHandler tool = tool("request_return", true, true);
+        ChatContext context = new ChatContext("session-1", "user-1", true)
+            .withCurrentIdempotencyKey("pending-idem-key");
+        Map<String, Object> args = Map.of("orderId", "order-1");
+        ToolResult expected = ToolResult.success(Map.of("returnId", "return-1"));
+        when(idempotencyStore.get("pending-idem-key")).thenReturn(Optional.empty());
+        when(tool.execute(eq(args), any(ChatContext.class))).thenReturn(expected);
+        executeLockAction("tool:request_return:order-1");
+        ToolExecutor executor = executorWith(tool);
+
+        ToolResult result = executor.execute("request_return", args, context);
+
+        assertThat(result).isSameAs(expected);
+        verify(idempotencyStore).get("pending-idem-key");
+        verify(idempotencyStore).save(eq("pending-idem-key"), same(expected), any(Duration.class));
+        verify(tool).execute(
+            eq(args),
+            argThat(chatContext -> "pending-idem-key".equals(chatContext.currentIdempotencyKey()))
+        );
+    }
+
+    @Test
     @DisplayName("변경성 Tool은 주문 단위 분산락 안에서 실행한다")
     void mutation_tool_is_executed_with_distributed_lock() {
         ToolHandler tool = tool("request_return", true, true);

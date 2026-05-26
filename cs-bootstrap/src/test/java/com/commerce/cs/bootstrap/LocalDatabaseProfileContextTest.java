@@ -1,4 +1,4 @@
-﻿package com.commerce.cs.bootstrap;
+package com.commerce.cs.bootstrap;
 
 import com.commerce.cs.api.chat.ChatController;
 import com.commerce.cs.api.session.SessionController;

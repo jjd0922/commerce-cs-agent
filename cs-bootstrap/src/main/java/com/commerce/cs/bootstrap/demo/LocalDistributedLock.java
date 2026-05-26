@@ -11,7 +11,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 @Component
-@Profile("demo")
+@Profile({"demo", "local"})
 public class LocalDistributedLock implements DistributedLock {
 
     private final Map<String, ReentrantLock> locks = new ConcurrentHashMap<>();

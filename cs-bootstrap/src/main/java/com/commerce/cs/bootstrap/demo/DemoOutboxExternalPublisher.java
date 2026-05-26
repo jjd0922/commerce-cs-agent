@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
-@Profile("demo")
+@Profile({"demo", "local"})
 public class DemoOutboxExternalPublisher implements OutboxExternalPublisher {
 
     private static final Logger log = LoggerFactory.getLogger(DemoOutboxExternalPublisher.class);

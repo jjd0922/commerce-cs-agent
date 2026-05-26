@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-@Profile("demo")
+@Profile({"demo", "local"})
 public class InMemoryCustomerLookupAdapter implements CustomerLookupPort {
 
     private final Map<String, CustomerIdentity> customers = new ConcurrentHashMap<>();

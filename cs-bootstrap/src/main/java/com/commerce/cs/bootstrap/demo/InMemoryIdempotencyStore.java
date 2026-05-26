@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-@Profile("demo")
+@Profile({"demo", "local"})
 public class InMemoryIdempotencyStore implements IdempotencyStore {
 
     private final Map<String, Entry> values = new ConcurrentHashMap<>();

@@ -15,7 +15,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-@Profile("demo")
+@Profile({"demo", "local"})
 public class InMemorySessionManager implements SessionManager, SessionStore {
 
     private static final Duration DEFAULT_TTL = Duration.ofMinutes(30);

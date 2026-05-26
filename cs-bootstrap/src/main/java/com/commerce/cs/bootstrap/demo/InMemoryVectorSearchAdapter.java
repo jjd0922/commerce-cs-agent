@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-@Profile("demo")
+@Profile({"demo", "local"})
 public class InMemoryVectorSearchAdapter implements VectorSearchPort {
 
     @Override

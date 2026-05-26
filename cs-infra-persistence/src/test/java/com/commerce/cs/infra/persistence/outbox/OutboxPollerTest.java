@@ -8,62 +8,45 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Pageable;
 
-import java.time.Clock;
 import java.time.Instant;
-import java.time.ZoneOffset;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @DisplayName("OutboxPoller 메시지 발행 처리")
 @ExtendWith(MockitoExtension.class)
 class OutboxPollerTest {
 
-    private static final Clock CLOCK = Clock.fixed(
-        Instant.parse("2026-05-23T00:01:00Z"),
-        ZoneOffset.UTC
-    );
-
     @Mock
     private OutboxJpaRepository outboxJpaRepository;
 
     @Mock
-    private OutboxExternalPublisher externalPublisher;
+    private OutboxMessagePublishService publishService;
 
     @Test
-    @DisplayName("PENDING 메시지를 조회해 외부 발행 후 PUBLISHED 상태로 저장한다")
-    void poll_publishes_pending_message_and_marks_published() {
+    @DisplayName("PENDING 메시지를 조회해 발행 서비스에 위임한다")
+    void poll_delegates_pending_messages_to_publish_service() {
         OutboxMessage message = message();
         when(outboxJpaRepository.findPendingForUpdate(any(Pageable.class))).thenReturn(List.of(message));
-        OutboxPoller poller = new OutboxPoller(outboxJpaRepository, externalPublisher, CLOCK);
+        OutboxPoller poller = new OutboxPoller(outboxJpaRepository, publishService);
 
         poller.poll();
 
-        verify(externalPublisher).publish(message.eventType(), message.payload());
-        verify(outboxJpaRepository).save(message);
-        assertThat(message.status()).isEqualTo(OutboxStatus.PUBLISHED);
+        verify(publishService).publish(message);
     }
 
     @Test
-    @DisplayName("외부 발행 실패 시 재시도 횟수를 증가시키고 메시지를 저장한다")
-    void poll_increments_retry_count_when_publish_fails() {
-        OutboxMessage message = message();
-        when(outboxJpaRepository.findPendingForUpdate(any(Pageable.class))).thenReturn(List.of(message));
-        doThrow(new IllegalStateException("publish failed"))
-            .when(externalPublisher)
-            .publish(eq(message.eventType()), eq(message.payload()));
-        OutboxPoller poller = new OutboxPoller(outboxJpaRepository, externalPublisher, CLOCK);
+    @DisplayName("PENDING 메시지가 없으면 발행 서비스가 호출되지 않는다")
+    void poll_does_not_call_publish_service_when_no_message_exists() {
+        when(outboxJpaRepository.findPendingForUpdate(any(Pageable.class))).thenReturn(List.of());
+        OutboxPoller poller = new OutboxPoller(outboxJpaRepository, publishService);
 
         poller.poll();
 
-        verify(outboxJpaRepository).save(message);
-        assertThat(message.retryCount()).isEqualTo(1);
-        assertThat(message.status()).isEqualTo(OutboxStatus.PENDING);
+        verifyNoInteractions(publishService);
     }
 
     private OutboxMessage message() {

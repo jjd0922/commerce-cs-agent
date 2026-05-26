@@ -2,12 +2,14 @@ package com.commerce.cs.bootstrap.demo;
 
 import com.commerce.cs.application.rag.SearchDocument;
 import com.commerce.cs.application.rag.VectorSearchPort;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
 
 @Component
+@Profile("demo")
 public class InMemoryVectorSearchAdapter implements VectorSearchPort {
 
     @Override

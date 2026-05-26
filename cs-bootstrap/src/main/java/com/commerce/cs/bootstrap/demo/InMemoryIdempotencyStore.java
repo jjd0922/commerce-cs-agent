@@ -2,6 +2,7 @@ package com.commerce.cs.bootstrap.demo;
 
 import com.commerce.cs.application.idempotency.IdempotencyStore;
 import com.commerce.cs.application.tool.ToolResult;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -11,6 +12,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
+@Profile("demo")
 public class InMemoryIdempotencyStore implements IdempotencyStore {
 
     private final Map<String, Entry> values = new ConcurrentHashMap<>();

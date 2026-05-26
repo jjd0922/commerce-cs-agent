@@ -7,6 +7,7 @@ import com.commerce.cs.domain.order.OrderItem;
 import com.commerce.cs.domain.order.OrderStatus;
 import com.commerce.cs.domain.order.PaymentStatus;
 import com.commerce.cs.domain.order.ShipmentStatus;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
@@ -16,6 +17,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
+@Profile("demo")
 public class InMemoryOrderRepository implements OrderRepository {
 
     private final Map<String, Order> orders = new ConcurrentHashMap<>();

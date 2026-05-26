@@ -2,6 +2,7 @@ package com.commerce.cs.bootstrap.demo;
 
 import com.commerce.cs.application.rag.QueryResultCachePort;
 import com.commerce.cs.application.rag.SearchDocument;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -12,6 +13,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
+@Profile("demo")
 public class InMemoryQueryResultCacheAdapter implements QueryResultCachePort {
 
     private final Map<String, Entry> values = new ConcurrentHashMap<>();

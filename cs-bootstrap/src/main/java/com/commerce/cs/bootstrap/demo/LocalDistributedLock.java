@@ -1,6 +1,7 @@
 package com.commerce.cs.bootstrap.demo;
 
 import com.commerce.cs.application.lock.DistributedLock;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -10,6 +11,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 @Component
+@Profile("demo")
 public class LocalDistributedLock implements DistributedLock {
 
     private final Map<String, ReentrantLock> locks = new ConcurrentHashMap<>();

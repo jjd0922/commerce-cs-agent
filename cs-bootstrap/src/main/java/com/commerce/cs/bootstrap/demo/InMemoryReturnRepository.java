@@ -2,6 +2,7 @@ package com.commerce.cs.bootstrap.demo;
 
 import com.commerce.cs.application.returns.ReturnRepository;
 import com.commerce.cs.domain.returns.Return;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
+@Profile("demo")
 public class InMemoryReturnRepository implements ReturnRepository {
 
     private final Map<String, Return> returnsByIdempotencyKey = new ConcurrentHashMap<>();

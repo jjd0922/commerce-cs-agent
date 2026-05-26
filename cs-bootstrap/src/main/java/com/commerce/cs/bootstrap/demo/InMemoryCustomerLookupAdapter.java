@@ -2,6 +2,7 @@ package com.commerce.cs.bootstrap.demo;
 
 import com.commerce.cs.application.verification.CustomerIdentity;
 import com.commerce.cs.application.verification.CustomerLookupPort;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
+@Profile("demo")
 public class InMemoryCustomerLookupAdapter implements CustomerLookupPort {
 
     private final Map<String, CustomerIdentity> customers = new ConcurrentHashMap<>();

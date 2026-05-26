@@ -6,6 +6,7 @@ import com.commerce.cs.application.chat.SessionContext;
 import com.commerce.cs.application.chat.SessionManager;
 import com.commerce.cs.application.session.SessionState;
 import com.commerce.cs.application.session.SessionStore;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -14,6 +15,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
+@Profile("demo")
 public class InMemorySessionManager implements SessionManager, SessionStore {
 
     private static final Duration DEFAULT_TTL = Duration.ofMinutes(30);

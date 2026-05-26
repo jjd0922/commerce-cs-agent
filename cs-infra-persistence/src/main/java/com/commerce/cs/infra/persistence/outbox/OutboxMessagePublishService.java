@@ -1,12 +1,14 @@
 package com.commerce.cs.infra.persistence.outbox;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 
 @Service
+@Profile("local")
 @RequiredArgsConstructor
 public class OutboxMessagePublishService {
 

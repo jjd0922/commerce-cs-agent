@@ -53,6 +53,9 @@ create table outbox_messages (
     occurred_at datetime(6),
     created_at datetime(6),
     published_at datetime(6),
+    last_failed_at datetime(6),
+    last_failure_reason varchar(1000),
+    dead_letter_reason varchar(1000),
     primary key (id)
 );
 

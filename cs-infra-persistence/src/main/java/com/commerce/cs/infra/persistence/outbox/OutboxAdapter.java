@@ -5,11 +5,13 @@ import com.commerce.cs.domain.event.DomainEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import java.time.Clock;
 
 @Repository
+@Profile("local")
 @RequiredArgsConstructor
 public class OutboxAdapter implements OutboxPort {
 

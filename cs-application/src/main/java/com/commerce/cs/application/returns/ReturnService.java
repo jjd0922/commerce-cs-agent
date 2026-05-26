@@ -45,7 +45,10 @@ public class ReturnService implements ReturnUseCase {
             command.detail(),
             now
         );
-        returnRepository.save(returnRequest, command.idempotencyKey());
+        Return savedReturn = saveReturn(returnRequest, command);
+        if (savedReturn != returnRequest) {
+            return toResult(savedReturn, savedReturn.requestedAt(), order);
+        }
         outboxPort.save(new ReturnRequestedEvent(
             returnRequest.id(),
             returnRequest.orderId(),
@@ -53,6 +56,16 @@ public class ReturnService implements ReturnUseCase {
             now
         ));
         return toResult(returnRequest, now, order);
+    }
+
+    private Return saveReturn(Return returnRequest, ReturnCommand command) {
+        try {
+            returnRepository.save(returnRequest, command.idempotencyKey());
+            return returnRequest;
+        } catch (DuplicateReturnRequestException e) {
+            return returnRepository.findByIdempotencyKey(command.idempotencyKey())
+                .orElseThrow(() -> e);
+        }
     }
 
     private ReturnResult toResult(Return returnRequest, Instant requestedAt, Order order) {

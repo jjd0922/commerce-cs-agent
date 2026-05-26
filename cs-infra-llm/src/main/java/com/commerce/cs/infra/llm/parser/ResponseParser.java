@@ -5,6 +5,9 @@ import com.commerce.cs.infra.llm.client.AnthropicMessageResponse;
 import com.commerce.cs.infra.llm.client.LlmResponseParseException;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Component
 public class ResponseParser {
 
@@ -13,21 +16,33 @@ public class ResponseParser {
             throw new LlmResponseParseException("LLM response content is empty");
         }
 
-        AnthropicMessageResponse.ContentBlock first = response.content().get(0);
-        if (first instanceof AnthropicMessageResponse.ContentBlock.Text text) {
-            return parseText(text);
+        AnthropicMessageResponse.ContentBlock.ToolUse toolUse = null;
+        List<String> texts = new ArrayList<>();
+
+        for (AnthropicMessageResponse.ContentBlock block : response.content()) {
+            if (block instanceof AnthropicMessageResponse.ContentBlock.ToolUse currentToolUse) {
+                if (toolUse != null) {
+                    throw new LlmResponseParseException("Multiple LLM tool_use blocks are not supported");
+                }
+                toolUse = currentToolUse;
+                continue;
+            }
+            if (block instanceof AnthropicMessageResponse.ContentBlock.Text text
+                && text.text() != null
+                && !text.text().isBlank()) {
+                texts.add(text.text());
+            }
         }
-        if (first instanceof AnthropicMessageResponse.ContentBlock.ToolUse toolUse) {
+
+        if (toolUse != null) {
             return parseToolUse(toolUse);
         }
-        throw new LlmResponseParseException("Unsupported LLM content block: " + first.getClass().getName());
-    }
 
-    private LlmResponse parseText(AnthropicMessageResponse.ContentBlock.Text text) {
-        if (text.text() == null || text.text().isBlank()) {
-            throw new LlmResponseParseException("LLM text response is blank");
+        if (!texts.isEmpty()) {
+            return new LlmResponse.Text(String.join("\n", texts));
         }
-        return new LlmResponse.Text(text.text());
+
+        throw new LlmResponseParseException("LLM text response is blank");
     }
 
     private LlmResponse parseToolUse(AnthropicMessageResponse.ContentBlock.ToolUse toolUse) {

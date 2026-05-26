@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: commerce-cs-agent-demo
+  main:
+    banner-mode: off
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.commerce.cs: INFO

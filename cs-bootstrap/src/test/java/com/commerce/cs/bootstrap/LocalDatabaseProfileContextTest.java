@@ -15,13 +15,13 @@ import com.commerce.cs.application.returns.ReturnUseCase;
 import com.commerce.cs.application.verification.CustomerLookupPort;
 import com.commerce.cs.application.verification.VerificationUseCase;
 import com.commerce.cs.bootstrap.demo.DemoAnthropicGateway;
-import com.commerce.cs.bootstrap.demo.DemoOutboxExternalPublisher;
 import com.commerce.cs.bootstrap.demo.InMemoryCustomerLookupAdapter;
 import com.commerce.cs.bootstrap.demo.InMemoryIdempotencyStore;
 import com.commerce.cs.bootstrap.demo.InMemoryQueryResultCacheAdapter;
 import com.commerce.cs.bootstrap.demo.InMemorySessionManager;
 import com.commerce.cs.bootstrap.demo.InMemoryVectorSearchAdapter;
 import com.commerce.cs.bootstrap.demo.LocalDistributedLock;
+import com.commerce.cs.bootstrap.local.LocalOutboxExternalPublisher;
 import com.commerce.cs.infra.llm.client.AnthropicGateway;
 import com.commerce.cs.infra.persistence.order.OrderRepositoryAdapter;
 import com.commerce.cs.infra.persistence.order.OrderJpaRepository;
@@ -157,7 +157,7 @@ class LocalDatabaseProfileContextTest {
         assertThat(orderRepository).isInstanceOf(OrderRepositoryAdapter.class);
         assertThat(returnRepository).isInstanceOf(ReturnRepositoryAdapter.class);
         assertThat(outboxPort).isInstanceOf(OutboxAdapter.class);
-        assertThat(outboxExternalPublisher).isInstanceOf(DemoOutboxExternalPublisher.class);
+        assertThat(outboxExternalPublisher).isInstanceOf(LocalOutboxExternalPublisher.class);
 
         assertThat(idempotencyStore).isInstanceOf(InMemoryIdempotencyStore.class);
         assertThat(distributedLock).isInstanceOf(LocalDistributedLock.class);

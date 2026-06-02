@@ -1,13 +1,21 @@
 package com.commerce.cs.api.chat;
 
+import com.commerce.cs.api.error.ApiExceptionHandler;
 import com.commerce.cs.application.chat.ChatResult;
 import com.commerce.cs.application.chat.ChatUseCase;
 import com.commerce.cs.application.tool.ToolResult;
+import com.commerce.cs.application.tool.UnknownToolException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import java.util.Map;
 
@@ -15,6 +23,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @DisplayName("ChatController 응답 매핑")
 @ExtendWith(MockitoExtension.class)
@@ -62,5 +73,54 @@ class ChatControllerTest {
 
         assertThat(response.type()).isEqualTo("TOOL_EXECUTED");
         assertThat(response.data()).containsEntry("returnId", "return-1");
+    }
+
+    @Test
+    @DisplayName("검증 실패 시 VALIDATION_ERROR 응답을 반환한다")
+    void chat_returns_validation_error_when_request_is_invalid() throws Exception {
+        MockMvc mockMvc = mockMvc();
+
+        mockMvc.perform(post("/api/chat")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                      "sessionId": "",
+                      "message": ""
+                    }
+                    """))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
+            .andExpect(jsonPath("$.errors[?(@.field == 'sessionId')]").exists())
+            .andExpect(jsonPath("$.errors[?(@.field == 'message')]").exists());
+    }
+
+    @Test
+    @DisplayName("알 수 없는 Tool 예외는 UNKNOWN_TOOL 응답으로 변환한다")
+    void chat_maps_unknown_tool_exception_to_error_response() throws Exception {
+        when(chatUseCase.handle(argThat(command -> command.message().equals("unknown"))))
+            .thenThrow(new UnknownToolException("missing_tool"));
+        MockMvc mockMvc = mockMvc();
+
+        mockMvc.perform(post("/api/chat")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                      "sessionId": "session-1",
+                      "message": "unknown"
+                    }
+                    """))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.code").value("UNKNOWN_TOOL"))
+            .andExpect(jsonPath("$.message").value("Unknown tool: missing_tool"));
+    }
+
+    private MockMvc mockMvc() {
+        LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
+        validator.afterPropertiesSet();
+        return MockMvcBuilders.standaloneSetup(new ChatController(chatUseCase))
+            .setControllerAdvice(new ApiExceptionHandler())
+            .setValidator(validator)
+            .setMessageConverters(new MappingJackson2HttpMessageConverter(new ObjectMapper()))
+            .build();
     }
 }

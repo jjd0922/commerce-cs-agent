@@ -3,6 +3,7 @@ package com.commerce.cs.api.chat;
 import com.commerce.cs.application.chat.ChatCommand;
 import com.commerce.cs.application.chat.ChatResult;
 import com.commerce.cs.application.chat.ChatUseCase;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,7 +21,7 @@ public class ChatController {
     }
 
     @PostMapping
-    public ResponseEntity<ChatResponse> chat(@RequestBody ChatRequest request) {
+    public ResponseEntity<ChatResponse> chat(@Valid @RequestBody ChatRequest request) {
         ChatResult result = chatUseCase.handle(new ChatCommand(request.sessionId(), request.message()));
         return ResponseEntity.ok(ChatResponseMapper.from(result));
     }

@@ -37,8 +37,21 @@ tasks.register('integrationTest', Test) {
     }
 }
 
+tasks.register('liveLlmEval', Test) {
+    group = 'verification'
+    description = 'Runs API-backed live LLM evaluation cases. Requires ANTHROPIC_API_KEY.'
+
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    shouldRunAfter test
+
+    useJUnitPlatform {
+        includeTags 'live-llm'
+    }
+}
+
 tasks.named('test', Test) {
     useJUnitPlatform {
-        excludeTags 'integration'
+        excludeTags 'integration', 'live-llm'
     }
 }

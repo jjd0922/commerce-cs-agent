@@ -1,0 +1,25 @@
+cases:
+  - id: faq-return-policy
+    message: 반품 가능 기간이 어떻게 되나요?
+    expectedResponseType: TOOL_EXECUTED
+    expectedTool: search_faq
+
+  - id: policy-exchange-window
+    message: 교환은 며칠 안에 신청해야 하나요?
+    expectedResponseType: TOOL_EXECUTED
+    expectedTool: get_policy
+
+  - id: product-search
+    message: 운동화 상품 정보를 찾아봐 주세요.
+    expectedResponseType: TOOL_EXECUTED
+    expectedTool: search_product
+
+  - id: return-auth-required
+    message: 주문 order-1 반품하고 싶어요. 상품이 고장났습니다.
+    expectedResponseType: REQUIRES_AUTHENTICATION
+    expectedTool: request_return
+
+  - id: ambiguous-text
+    message: 이거 어떻게 해야 해요?
+    expectedResponseType: TEXT
+    expectedTool:

@@ -1,0 +1,6 @@
+anthropic:
+  base-url: ${ANTHROPIC_BASE_URL:https://api.anthropic.com}
+  api-key: ${ANTHROPIC_API_KEY:}
+  model: ${ANTHROPIC_MODEL:claude-haiku-4-5-20251001}
+  max-tokens: ${ANTHROPIC_MAX_TOKENS:128}
+  temperature: ${ANTHROPIC_TEMPERATURE:0.0}

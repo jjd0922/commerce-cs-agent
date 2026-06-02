@@ -1,9 +1,9 @@
 package com.commerce.cs.bootstrap;
 
 import com.commerce.cs.api.chat.ChatResponse;
-import com.commerce.cs.api.error.ApiErrorResponse;
 import com.commerce.cs.bootstrap.demo.InMemoryOutboxPort;
 import com.commerce.cs.bootstrap.demo.InMemoryReturnRepository;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -122,8 +122,30 @@ class LiveLlmEvaluationRunnerTest {
             ChatResponse body = objectMapper.readValue(response.getBody(), ChatResponse.class);
             return new ObservedResponse(body.type(), inferTool(body));
         }
-        ApiErrorResponse error = objectMapper.readValue(response.getBody(), ApiErrorResponse.class);
-        return new ObservedResponse(error.code(), null);
+        return new ObservedResponse(errorCode(response.getBody()), null);
+    }
+
+    private String errorCode(String body) throws Exception {
+        if (body == null || body.isBlank()) {
+            return "HTTP_ERROR";
+        }
+        JsonNode root = objectMapper.readTree(body);
+        if (root.hasNonNull("code")) {
+            return root.get("code").asText();
+        }
+        if (root.hasNonNull("error")) {
+            return root.get("error").asText();
+        }
+        if (root.hasNonNull("message")) {
+            String message = root.get("message").asText();
+            if (message.contains("credit balance is too low")) {
+                return "ANTHROPIC_CREDIT_BALANCE_TOO_LOW";
+            }
+        }
+        if (root.hasNonNull("status")) {
+            return "HTTP_" + root.get("status").asInt();
+        }
+        return "HTTP_ERROR";
     }
 
     private String inferTool(ChatResponse response) {

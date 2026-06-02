@@ -1,7 +1,6 @@
 plugins {
     id 'org.springframework.boot' version '3.3.5' apply false
     id 'io.spring.dependency-management' version '1.1.6' apply false
-    id 'jacoco'
 }
 
 ext {
@@ -31,7 +30,13 @@ subprojects {
         useJUnitPlatform()
     }
 
-    tasks.withType(JacocoReport).configureEach {
+    tasks.named('test', Test) {
+        finalizedBy tasks.named('jacocoTestReport')
+    }
+
+    tasks.named('jacocoTestReport', JacocoReport) {
+        dependsOn tasks.named('test')
+
         reports {
             xml.required = true
             html.required = true
@@ -41,28 +46,5 @@ subprojects {
 
     tasks.withType(JavaCompile).configureEach {
         options.encoding = 'UTF-8'
-    }
-}
-
-tasks.register('jacocoRootReport', JacocoReport) {
-    group = 'verification'
-    description = 'Generates an aggregate JaCoCo coverage report for Codecov.'
-
-    dependsOn subprojects.collect { it.tasks.named('test') }
-
-    sourceDirectories.from files(subprojects.collect {
-        it.sourceSets.main.allSource.srcDirs
-    })
-    classDirectories.from files(subprojects.collect {
-        it.sourceSets.main.output
-    })
-    executionData.from fileTree(rootDir) {
-        include '**/build/jacoco/test.exec'
-    }
-
-    reports {
-        xml.required = true
-        html.required = true
-        csv.required = false
     }
 }

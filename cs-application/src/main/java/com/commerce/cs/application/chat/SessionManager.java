@@ -8,5 +8,7 @@ public interface SessionManager {
 
     void clearPendingAction(String sessionId);
 
+    void appendUserMessage(String sessionId, String message);
+
     void appendAssistantMessage(String sessionId, String message);
 }

@@ -17,8 +17,6 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    env:
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
     steps:
       - name: Checkout
@@ -36,15 +34,14 @@ jobs:
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
 
-      - name: Run unit and mock evaluation tests
-        run: ./gradlew test jacocoRootReport
+      - name: Run tests and generate coverage report
+        run: ./gradlew clean test jacocoTestReport
 
-      - name: Upload coverage to Codecov
-        if: env.CODECOV_TOKEN != ''
+      - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
         with:
-          token: ${{ env.CODECOV_TOKEN }}
-          files: ./build/reports/jacoco/jacocoRootReport/jacocoRootReport.xml
+          files: |
+            **/build/reports/jacoco/test/jacocoTestReport.xml
           fail_ci_if_error: true
 
       - name: Run Docker-backed integration tests

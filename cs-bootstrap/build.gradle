@@ -22,3 +22,16 @@ dependencies {
     testImplementation 'org.testcontainers:junit-jupiter:1.20.4'
     testImplementation 'org.testcontainers:mysql:1.20.4'
 }
+
+tasks.register('integrationTest', Test) {
+    group = 'verification'
+    description = 'Runs Docker-backed integration tests for the local profile.'
+
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    shouldRunAfter test
+
+    useJUnitPlatform {
+        includeTags 'integration'
+    }
+}

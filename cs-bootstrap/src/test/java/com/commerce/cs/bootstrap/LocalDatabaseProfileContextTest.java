@@ -32,6 +32,7 @@ import com.commerce.cs.infra.persistence.returns.ReturnRepositoryAdapter;
 import com.commerce.cs.infra.persistence.returns.ReturnJpaRepository;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -47,6 +48,7 @@ import javax.sql.DataSource;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("local DB profile bootstrap 而⑦뀓?ㅽ듃")
+@Tag("integration")
 @Testcontainers(disabledWithoutDocker = true)
 @ActiveProfiles("local")
 @SpringBootTest(

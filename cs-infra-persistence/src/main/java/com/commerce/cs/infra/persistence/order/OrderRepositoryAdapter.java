@@ -3,11 +3,13 @@ package com.commerce.cs.infra.persistence.order;
 import com.commerce.cs.application.order.OrderRepository;
 import com.commerce.cs.domain.order.Order;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
+@Profile("local")
 @RequiredArgsConstructor
 public class OrderRepositoryAdapter implements OrderRepository {
 

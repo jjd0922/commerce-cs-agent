@@ -1,6 +1,7 @@
 package com.commerce.cs.infra.persistence.outbox;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -10,6 +11,7 @@ import java.time.Clock;
 import java.util.List;
 
 @Component
+@Profile("local")
 @RequiredArgsConstructor
 public class OutboxPoller {
 

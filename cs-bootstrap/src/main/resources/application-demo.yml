@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: commerce-cs-agent-demo
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration
+      - org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration
+  main:
+    banner-mode: off
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.commerce.cs: INFO

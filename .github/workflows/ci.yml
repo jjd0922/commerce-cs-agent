@@ -35,7 +35,14 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Run unit and mock evaluation tests
-        run: ./gradlew test
+        run: ./gradlew test jacocoRootReport
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./build/reports/jacoco/jacocoRootReport/jacocoRootReport.xml
+          fail_ci_if_error: true
 
       - name: Run Docker-backed integration tests
         run: ./gradlew :cs-bootstrap:integrationTest

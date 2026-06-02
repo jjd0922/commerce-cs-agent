@@ -31,7 +31,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-@DisplayName("ToolExecutor 실행 및 검증 흐름")
+@DisplayName("ToolExecutionService 실행 및 검증 흐름")
 @ExtendWith(MockitoExtension.class)
 class ToolExecutorTest {
 
@@ -45,6 +45,7 @@ class ToolExecutorTest {
     @DisplayName("인증이 필요한 Tool은 미인증 컨텍스트에서 본인확인을 요구한다")
     void authenticated_tool_requires_authentication_when_context_is_not_authenticated() {
         ToolHandler tool = tool("get_order", true, false);
+        when(tool.authenticationMessage()).thenReturn("Authentication is required.");
         ToolExecutor executor = executorWith(tool);
 
         ValidationResult result = executor.validate(
@@ -159,7 +160,7 @@ class ToolExecutorTest {
     }
 
     private ToolExecutor executorWith(ToolHandler... tools) {
-        return new ToolExecutor(List.of(tools), idempotencyStore, distributedLock);
+        return new ToolExecutionService(List.of(tools), idempotencyStore, distributedLock);
     }
 
     private ToolHandler tool(String name, boolean requiresAuthentication, boolean mutation) {

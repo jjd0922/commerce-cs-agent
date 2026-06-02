@@ -36,3 +36,9 @@ tasks.register('integrationTest', Test) {
         includeTags 'integration'
     }
 }
+
+tasks.named('test', Test) {
+    useJUnitPlatform {
+        excludeTags 'integration'
+    }
+}

@@ -18,6 +18,7 @@ allprojects {
 
 subprojects {
     apply plugin: 'java'
+    apply plugin: 'jacoco'
 
     java {
         toolchain {
@@ -27,6 +28,20 @@ subprojects {
 
     tasks.withType(Test).configureEach {
         useJUnitPlatform()
+    }
+
+    tasks.named('test', Test) {
+        finalizedBy tasks.named('jacocoTestReport')
+    }
+
+    tasks.named('jacocoTestReport', JacocoReport) {
+        dependsOn tasks.named('test')
+
+        reports {
+            xml.required = true
+            html.required = true
+            csv.required = false
+        }
     }
 
     tasks.withType(JavaCompile).configureEach {

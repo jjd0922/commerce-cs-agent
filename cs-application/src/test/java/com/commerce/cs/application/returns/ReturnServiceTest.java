@@ -30,6 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -104,6 +105,32 @@ class ReturnServiceTest {
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("not returnable");
         verify(returnRepository, never()).save(any(Return.class), any());
+        verify(outboxPort, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("저장 중 idempotency unique 충돌이 발생하면 기존 Return을 재조회해 반환한다")
+    void request_return_returns_existing_result_when_idempotency_conflict_occurs() {
+        Return existingReturn = Return.request(
+            "return-1",
+            "order-1",
+            "user-1",
+            ReturnReason.DEFECT,
+            "broken",
+            NOW
+        );
+        when(returnRepository.findByIdempotencyKey("idem-1"))
+            .thenReturn(Optional.empty(), Optional.of(existingReturn));
+        when(orderRepository.findByIdAndUserId("order-1", "user-1")).thenReturn(Optional.of(deliveredOrder()));
+        doThrow(new DuplicateReturnRequestException("idem-1", new RuntimeException("duplicate")))
+            .when(returnRepository)
+            .save(any(Return.class), eq("idem-1"));
+        ReturnUseCase useCase = useCase();
+
+        ReturnResult result = useCase.requestReturn(command("idem-1"));
+
+        assertThat(result.returnId()).isEqualTo("return-1");
+        assertThat(result.status()).isEqualTo(ReturnStatus.REQUESTED);
         verify(outboxPort, never()).save(any());
     }
 

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
@@ -19,11 +20,25 @@ public class LocalDistributedLock implements DistributedLock {
     @Override
     public <T> T withLock(String key, Duration timeout, Supplier<T> action) {
         ReentrantLock lock = locks.computeIfAbsent(key, ignored -> new ReentrantLock());
-        lock.lock();
+        boolean acquired = acquire(lock, key, timeout);
         try {
             return action.get();
         } finally {
-            lock.unlock();
+            if (acquired) {
+                lock.unlock();
+            }
         }
+    }
+
+    private boolean acquire(ReentrantLock lock, String key, Duration timeout) {
+        try {
+            if (lock.tryLock(timeout.toMillis(), TimeUnit.MILLISECONDS)) {
+                return true;
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Interrupted while acquiring lock: " + key, e);
+        }
+        throw new IllegalStateException("Could not acquire lock within timeout: " + key);
     }
 }

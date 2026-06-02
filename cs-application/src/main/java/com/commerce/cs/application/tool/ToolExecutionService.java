@@ -42,7 +42,7 @@ public class ToolExecutionService implements ToolExecutor {
     public ToolResult execute(String toolName, Map<String, Object> args, ChatContext context) {
         ToolHandler tool = findTool(toolName);
         Map<String, Object> normalizedArgs = normalizeArgs(args);
-        String idempotencyKey = IdempotencyKeyBuilder.build(context.sessionId(), toolName, normalizedArgs);
+        String idempotencyKey = idempotencyKey(context, toolName, normalizedArgs);
 
         return idempotencyStore.get(idempotencyKey)
             .orElseGet(() -> executeAndSave(tool, normalizedArgs, context.withCurrentIdempotencyKey(idempotencyKey), idempotencyKey));
@@ -76,6 +76,13 @@ public class ToolExecutionService implements ToolExecutor {
 
     private Map<String, Object> normalizeArgs(Map<String, Object> args) {
         return args == null ? Map.of() : Map.copyOf(args);
+    }
+
+    private String idempotencyKey(ChatContext context, String toolName, Map<String, Object> args) {
+        if (context.currentIdempotencyKey() != null && !context.currentIdempotencyKey().isBlank()) {
+            return context.currentIdempotencyKey();
+        }
+        return IdempotencyKeyBuilder.build(context.sessionId(), toolName, args);
     }
 
     private String lockKey(String toolName, Map<String, Object> args) {

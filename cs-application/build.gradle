@@ -1,6 +1,7 @@
 dependencies {
     implementation project(':cs-domain')
     implementation "org.springframework:spring-context:${springFrameworkVersion}"
+    implementation "org.springframework:spring-tx:${springFrameworkVersion}"
 
     compileOnly 'org.projectlombok:lombok:1.18.34'
     annotationProcessor 'org.projectlombok:lombok:1.18.34'

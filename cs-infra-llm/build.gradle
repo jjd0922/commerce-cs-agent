@@ -1,7 +1,9 @@
 dependencies {
     implementation project(':cs-application')
     implementation "org.springframework:spring-context:${springFrameworkVersion}"
+    implementation "org.springframework:spring-web:${springFrameworkVersion}"
     implementation 'io.github.resilience4j:resilience4j-spring6:2.2.0'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.2'
 
     compileOnly 'org.projectlombok:lombok:1.18.34'
     annotationProcessor 'org.projectlombok:lombok:1.18.34'

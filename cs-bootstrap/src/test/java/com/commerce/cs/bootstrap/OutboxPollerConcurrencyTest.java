@@ -40,7 +40,10 @@ import static org.mockito.Mockito.verify;
 @SpringBootTest(
     classes = CommerceCsAgentApplication.class,
     webEnvironment = SpringBootTest.WebEnvironment.NONE,
-    properties = "spring.task.scheduling.enabled=false"
+    properties = {
+        "spring.task.scheduling.enabled=false",
+        "commerce.outbox.poller.enabled=false"
+    }
 )
 class OutboxPollerConcurrencyTest {
 

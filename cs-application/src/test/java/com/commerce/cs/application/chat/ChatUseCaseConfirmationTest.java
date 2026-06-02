@@ -13,7 +13,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Clock;
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +41,8 @@ class ChatUseCaseConfirmationTest {
     @Mock
     private ToolExecutor toolExecutor;
 
+    private final Clock clock = Clock.fixed(Instant.parse("2026-05-22T00:00:00Z"), ZoneOffset.UTC);
+
     @Test
     @DisplayName("변경성 Tool 호출은 PendingAction으로 저장하고 confirmation 응답을 반환한다")
     void mutation_tool_use_is_saved_as_pending_action_and_returns_confirmation() {
@@ -61,6 +65,7 @@ class ChatUseCaseConfirmationTest {
                     && pendingAction.idempotencyKey().equals(
                     IdempotencyKeyBuilder.build(context.sessionId(), "request_return", args)
                 )
+                    && pendingAction.createdAt().equals(clock.instant())
             )
         );
         verify(toolExecutor, never()).execute(any(), any(), any());
@@ -143,7 +148,7 @@ class ChatUseCaseConfirmationTest {
     }
 
     private ChatUseCase useCase() {
-        return new ChatService(sessionManager, llmClient, toolExecutor);
+        return new ChatService(sessionManager, llmClient, toolExecutor, clock);
     }
 
     private PendingAction pendingAction(ChatContext context, String toolName, Map<String, Object> args) {

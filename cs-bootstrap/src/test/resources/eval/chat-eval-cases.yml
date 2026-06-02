@@ -1,0 +1,140 @@
+cases:
+  - id: faq-search
+    description: FAQ search routes to search_faq and returns answers.
+    profile: demo
+    givenSession:
+      sessionId: eval-faq
+      authenticated: false
+    messages:
+      - faq return policy
+    expectedResponseType: TOOL_EXECUTED
+    expectedTool: search_faq
+    expectedSideEffects:
+      returnCountDelta: 0
+      outboxEventDelta: 0
+      pendingAction: false
+
+  - id: policy-search
+    description: Policy search routes to get_policy and returns policies.
+    profile: demo
+    givenSession:
+      sessionId: eval-policy
+      authenticated: false
+    messages:
+      - policy exchange window
+    expectedResponseType: TOOL_EXECUTED
+    expectedTool: get_policy
+    expectedSideEffects:
+      returnCountDelta: 0
+      outboxEventDelta: 0
+      pendingAction: false
+
+  - id: product-search
+    description: Product search routes to search_product and returns products.
+    profile: demo
+    givenSession:
+      sessionId: eval-product
+      authenticated: false
+    messages:
+      - product sneakers
+    expectedResponseType: TOOL_EXECUTED
+    expectedTool: search_product
+    expectedSideEffects:
+      returnCountDelta: 0
+      outboxEventDelta: 0
+      pendingAction: false
+
+  - id: auth-required
+    description: Unauthenticated return request requires customer verification.
+    profile: demo
+    givenSession:
+      sessionId: eval-auth
+      authenticated: false
+    messages:
+      - return order-1 because defect
+    expectedResponseType: REQUIRES_AUTHENTICATION
+    expectedTool: request_return
+    expectedSideEffects:
+      returnCountDelta: 0
+      outboxEventDelta: 0
+      pendingAction: false
+
+  - id: return-confirmation
+    description: Authenticated return request requires confirmation before mutation.
+    profile: demo
+    givenSession:
+      sessionId: eval-confirm
+      authenticated: true
+    messages:
+      - return order-1 because defect
+    expectedResponseType: REQUIRES_CONFIRMATION
+    expectedTool: request_return
+    expectedSideEffects:
+      returnCountDelta: 0
+      outboxEventDelta: 0
+      pendingAction: true
+
+  - id: return-execution
+    description: Confirmed return request creates a return and outbox event.
+    profile: demo
+    givenSession:
+      sessionId: eval-execute
+      authenticated: true
+    messages:
+      - return order-1 because defect
+      - "yes"
+    expectedResponseType: TOOL_EXECUTED
+    expectedTool: request_return
+    expectedSideEffects:
+      returnCountDelta: 1
+      outboxEventDelta: 1
+      pendingAction: false
+
+  - id: return-policy-violation
+    description: Non-returnable order is rejected by domain policy.
+    profile: demo
+    givenSession:
+      sessionId: eval-policy-violation
+      authenticated: true
+    messages:
+      - return order-2 because defect
+      - "yes"
+    expectedResponseType: BAD_REQUEST
+    expectedTool: request_return
+    expectedSideEffects:
+      returnCountDelta: 0
+      outboxEventDelta: 0
+      pendingAction: true
+
+  - id: idempotency
+    description: Repeated confirmed return request returns cached result without duplicate side effects.
+    profile: demo
+    givenSession:
+      sessionId: eval-idempotency
+      authenticated: true
+    messages:
+      - return order-1 because defect
+      - "yes"
+      - return order-1 because defect
+      - "yes"
+    expectedResponseType: TOOL_EXECUTED
+    expectedTool: request_return
+    expectedSideEffects:
+      returnCountDelta: 1
+      outboxEventDelta: 1
+      pendingAction: false
+
+  - id: llm-fallback
+    description: Temporary LLM failure fallback returns a deterministic text response.
+    profile: demo
+    givenSession:
+      sessionId: eval-fallback
+      authenticated: false
+    messages:
+      - fallback please
+    expectedResponseType: TEXT
+    expectedTool:
+    expectedSideEffects:
+      returnCountDelta: 0
+      outboxEventDelta: 0
+      pendingAction: false

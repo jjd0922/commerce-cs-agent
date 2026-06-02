@@ -55,7 +55,8 @@ import static org.assertj.core.api.Assertions.assertThat;
     classes = CommerceCsAgentApplication.class,
     webEnvironment = SpringBootTest.WebEnvironment.NONE,
     properties = {
-        "spring.task.scheduling.enabled=false"
+        "spring.task.scheduling.enabled=false",
+        "commerce.outbox.poller.enabled=false"
     }
 )
 class LocalDatabaseProfileContextTest {

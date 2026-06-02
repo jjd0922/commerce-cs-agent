@@ -10,6 +10,8 @@ import com.commerce.cs.application.tool.ValidationResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Clock;
+
 @Service
 @RequiredArgsConstructor
 public class ChatService implements ChatUseCase {
@@ -17,6 +19,7 @@ public class ChatService implements ChatUseCase {
     private final SessionManager sessionManager;
     private final LlmClient llmClient;
     private final ToolExecutor toolExecutor;
+    private final Clock clock;
 
     @Override
     public ChatResult handle(ChatCommand command) {
@@ -90,7 +93,7 @@ public class ChatService implements ChatUseCase {
                 toolUse.toolName(),
                 toolUse.args(),
                 IdempotencyKeyBuilder.build(context.sessionId(), toolUse.toolName(), toolUse.args()),
-                java.time.Instant.now()
+                clock.instant()
             );
             sessionManager.savePendingAction(sessionId, pendingAction);
             sessionManager.appendAssistantMessage(sessionId, requiresConfirmation.message());

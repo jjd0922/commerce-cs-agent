@@ -21,6 +21,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.testcontainers:junit-jupiter:1.20.4'
     testImplementation 'org.testcontainers:mysql:1.20.4'
+    testImplementation 'org.yaml:snakeyaml:2.2'
 }
 
 tasks.register('integrationTest', Test) {
@@ -33,5 +34,24 @@ tasks.register('integrationTest', Test) {
 
     useJUnitPlatform {
         includeTags 'integration'
+    }
+}
+
+tasks.register('liveLlmEval', Test) {
+    group = 'verification'
+    description = 'Runs API-backed live LLM evaluation cases. Requires ANTHROPIC_API_KEY.'
+
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    shouldRunAfter test
+
+    useJUnitPlatform {
+        includeTags 'live-llm'
+    }
+}
+
+tasks.named('test', Test) {
+    useJUnitPlatform {
+        excludeTags 'integration', 'live-llm'
     }
 }

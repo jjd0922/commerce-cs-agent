@@ -1,5 +1,6 @@
 # Commerce CS Agent
 
+[![CI](https://github.com/jjd0922/commerce-cs-agent/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jjd0922/commerce-cs-agent/actions/workflows/ci.yml)
 [![Java](https://img.shields.io/badge/Java-17-orange)]()
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3.5-green)]()
 [![Gradle](https://img.shields.io/badge/Gradle-8.13-blue)]()

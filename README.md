@@ -75,11 +75,9 @@ $env:ANTHROPIC_MODEL="claude-haiku-4-5-20251001"
 - [실제 LLM 평가 가이드](docs/live-llm-evaluation.md)
 - [실제 LLM 평가 결과](docs/live-llm-evaluation-result.md)
 
-## 최근 측정 결과
+## 측정 결과
 
-아래 수치는 문서화된 로컬 실행 결과 기준이다. 실행 환경, 모델, 평가 케이스가 바뀌면 다시 측정해야 한다.
-
-mock LLM 기반 결정적 평가:
+mock LLM 기반 평가:
 
 - 평가 케이스 9개
 - 평가 JUnit 테스트 10개
